@@ -65,9 +65,7 @@ resource "aws_route_table_association" "public_assoc" {
 }
 
 # 6. Elastic IP + NAT Gateway for private subnet (optional)
-resource "aws_eip" "nat_eip" {
-  vpc = true
-}
+resource "aws_eip" "nat_eip" 
 
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat_eip.id
