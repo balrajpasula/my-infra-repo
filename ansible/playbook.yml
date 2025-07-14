@@ -1,0 +1,70 @@
+---
+- name: Install Apache, PHP, MySQL, phpMyAdmin
+  hosts: web
+  become: yes
+
+  vars:
+    mysql_root_password: "@Balrajpasula5782"
+
+  tasks:
+    - name: Update APT cache
+      apt:
+        update_cache: yes
+
+    - name: Install Apache2
+      apt:
+        name: apache2
+        state: present
+
+    - name: Install PHP and extensions
+      apt:
+        name:
+          - php
+          - php-mysql
+          - libapache2-mod-php
+        state: present
+
+    - name: Install MySQL Server
+      debconf:
+        name: mysql-server
+        question: 'mysql-server/root_password'
+        value: "{{ mysql_root_password }}"
+        vtype: 'password'
+    - debconf:
+        name: mysql-server
+        question: 'mysql-server/root_password_again'
+        value: "{{ mysql_root_password }}"
+        vtype: 'password'
+    - apt:
+        name: mysql-server
+        state: present
+
+    - name: Install phpMyAdmin
+      debconf:
+        name: phpmyadmin
+        question: 'phpmyadmin/reconfigure-webserver'
+        value: 'apache2'
+        vtype: 'multiselect'
+    - debconf:
+        name: phpmyadmin
+        question: 'phpmyadmin/dbconfig-install'
+        value: 'true'
+        vtype: 'boolean'
+    - debconf:
+        name: phpmyadmin
+        question: 'phpmyadmin/mysql/admin-pass'
+        value: "{{ mysql_root_password }}"
+        vtype: 'password'
+    - debconf:
+        name: phpmyadmin
+        question: 'phpmyadmin/mysql/app-pass'
+        value: "{{ mysql_root_password }}"
+        vtype: 'password'
+    - apt:
+        name: phpmyadmin
+        state: present
+
+    - name: Restart Apache2
+      service:
+        name: apache2
+        state: restarted
