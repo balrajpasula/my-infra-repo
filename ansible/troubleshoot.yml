@@ -1,0 +1,76 @@
+---
+- name: Troubleshoot Ubuntu EC2 Server (Apache + MySQL)
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+
+    - name: 🔍 Check system uptime
+      command: uptime
+      register: uptime_output
+
+    - name: Show uptime
+      debug:
+        var: uptime_output.stdout
+
+    - name: 💾 Check disk usage
+      command: df -h
+      register: disk_output
+
+    - name: Show disk usage
+      debug:
+        var: disk_output.stdout
+
+    - name: 🧮 Check memory usage
+      command: free -h
+      register: memory_output
+
+    - name: Show memory usage
+      debug:
+        var: memory_output.stdout
+
+    - name: 🔥 Check Apache service status
+      command: systemctl is-active apache2
+      register: apache_status
+      ignore_errors: yes
+
+    - name: Show Apache status
+      debug:
+        var: apache_status.stdout
+
+    - name: 📜 Show last 20 lines of Apache error log
+      command: tail -n 20 /var/log/apache2/error.log
+      register: apache_logs
+      ignore_errors: yes
+
+    - name: Show Apache logs
+      debug:
+        var: apache_logs.stdout_lines
+
+    - name: 🐬 Check MySQL service status
+      command: systemctl is-active mysql
+      register: mysql_status
+      ignore_errors: yes
+
+    - name: Show MySQL status
+      debug:
+        var: mysql_status.stdout
+
+    - name: 📜 Show last 20 lines of MySQL error log
+      command: tail -n 20 /var/log/mysql/error.log
+      register: mysql_logs
+      ignore_errors: yes
+
+    - name: Show MySQL logs
+      debug:
+        var: mysql_logs.stdout_lines
+
+    - name: 🌐 Check open ports
+      command: ss -tuln
+      register: ports
+      ignore_errors: yes
+
+    - name: Show open ports
+      debug:
+        var: ports.stdout_lines
