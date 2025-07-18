@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BKC Bazaar - 30 Swipeable Kurtis</title>
+  <style>
+    :root {
+      --primary-color: #2874f0;
+      --primary-dark: #1a5bcc;
+      --secondary-color: #fb641b;
+      --secondary-dark: #d14a10;
+      --text-color: #212121;
+      --light-bg: #f1f3f6;
+      --white: #ffffff;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      margin: 0;
+      background: var(--light-bg);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary-color), #1e88e5);
+      color: var(--white);
+      padding: 2rem 1rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .tagline {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .products-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .product {
+      flex: 1;
+      min-width: 300px;
+      max-width: 350px;
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+      overflow: hidden;
+    }
+
+    .product:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .carousel-container {
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .carousel-images {
+      display: flex;
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      width: 100%;
+    }
+
+    .carousel-images img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border-radius: 8px;
+    }
+
+    .controls {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    .controls button {
+      padding: 0.6rem 1.2rem;
+      margin: 0 0.5rem;
+      background-color: var(--primary-color);
+      color: var(--white);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .controls button:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .buy-now {
+      display: block;
+      margin: 1.5rem auto 0;
+      padding: 0.8rem 1.5rem;
+      background-color: var(--secondary-color);
+      color: var(--white);
+      font-size: 1rem;
+      text-align: center;
+      width: 80%;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: var(--transition);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .buy-now:hover {
+      background-color: var(--secondary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .product-title {
+      text-align: center;
+      margin: 1rem 0;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: var(--text-color);
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .products-container {
+        padding: 1rem;
+      }
+      
+      .product {
+        min-width: 280px;
+      }
+      
+      header h1 {
+        font-size: 2rem;
+      }
+    }
+
+    /* Animation for header */
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      transform: rotate(30deg);
+      z-index: 1;
+      animation: shine 8s infinite linear;
+    }
+
+    @keyframes shine {
+      0% {
+        transform: rotate(30deg) translate(-30%, -30%);
+      }
+      100% {
+        transform: rotate(30deg) translate(30%, 30%);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <h1>BKC Bazaar</h1>
+    <p class="tagline">Stylish Kurtis for Every Occasion</p>
+  </div>
+</header>
+
+<div class="products-container">
+  <!-- Row 1 -->
+  <div class="product">
+    <div class="product-title">Embroidered Ethnic Dress 1</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel1">
+        <img src="kurti_images/kurti1.png" alt="Kurti 1" alt="Kurti 1-1">
+        <img src="kurti_images/kurti2.png" alt="Kurti 1-2">
+        <img src="kurti_images/kurti3.png" alt="Kurti 1-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel1')">⟨ Prev</button>
+      <button onclick="next('carousel1')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="https://www.flipkart.com/bkc-bazaar-women-embroidered-ethnic-dress-kurta/p/itm04714150a5381?pid=KTAHDUN5H95H6BJY&lid=LSTKTAHDUN5H95H6BJYYLMBSE" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Printed Cotton Kurti 2</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel2">
+        <img src="kurti_images/kurti4.png" alt="Kurti 2-1">
+        <img src="kurti_images/kurti5.png" alt="Kurti 2-2">
+        <img src="kurti_images/kurti6.png" alt="Kurti 2-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel2')">⟨ Prev</button>
+      <button onclick="next('carousel2')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="https://www.flipkart.com/bkc-bazaar-women-embroidered-straight-kurta/p/itm5175c314bb2aa?pid=KTAHDUNZWGWZSZHK&lid=LSTKTAHDUNZWGWZSZHK52GBKV&marketplace=FLIPKART&q=BKC+BAZAAR+&store=search.flipkart.com&srno=s_1_23&otracker=search&otracker1=search&fm=Search&iid=6cc5597d-6689-48ed-bf30-1b5fccf33409.KTAHDUNZWGWZSZHK.SEARCH&ppt=sp&ppn=sp&ssid=dpdiencxr40000001752831078226&qH=5d2c6d69c7ab24ef" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Designer Anarkali Kurti 3</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel3">
+        <img src="kurti_images/kurti7.png" alt="Kurti 3-1">
+        <img src="kurti_images/kurti8.png" alt="Kurti 3-2">
+        <img src="kurti_images/kurti9.png" alt="Kurti 3-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel3')">⟨ Prev</button>
+      <button onclick="next('carousel3')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <!-- Row 2 -->
+  <div class="product">
+    <div class="product-title">Floral Print Kurti 4</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel4">
+        <img src="kurti_images/kurti10.png" alt="Kurti 4-1">
+        <img src="kurti_images/kurti11.png" alt="Kurti 4-2">
+        <img src="kurti_images/kurti12.png" alt="Kurti 4-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel4')">⟨ Prev</button>
+      <button onclick="next('carousel4')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="https://www.flipkart.com/bkc-bazaar-mumbai-mh-women-self-design-a-line-kurta/p/itm23592ca282a5f?pid=KTAHE3ZR2ABREHFA&lid=LSTKTAHE3ZR2ABREHFAILFXC0&marketplace=FLIPKART&q=BKC+BAZAAR+&store=search.flipkart.com&srno=s_1_15&otracker=search&otracker1=search&fm=Search&iid=6cc5597d-6689-48ed-bf30-1b5fccf33409.KTAHE3ZR2ABREHFA.SEARCH&ppt=sp&ppn=sp&qH=5d2c6d69c7ab24ef" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Georgette Kurti 5</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel5">
+        <img src="kurti_images/kurti13.png" alt="Kurti 5-1">
+        <img src="kurti_images/kurti14.png" alt="Kurti 5-2">
+        <img src="kurti_images/kurti15.png" alt="Kurti 5-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel5')">⟨ Prev</button>
+      <button onclick="next('carousel5')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="https://www.flipkart.com/bkc-bazaar-mumbai-mh-women-self-design-a-line-kurta/p/itme70e9d81da8d3?pid=KTAHE3ZTMTUTERVA&lid=LSTKTAHE3ZTMTUTERVAKJPWHP&marketplace=FLIPKART&q=BKC+BAZAAR+&store=search.flipkart.com&srno=s_1_1&otracker=search&otracker1=search&fm=Search&iid=6cc5597d-6689-48ed-bf30-1b5fccf33409.KTAHE3ZTMTUTERVA.SEARCH&ppt=sp&ppn=sp&ssid=dpdiencxr40000001752831078226&qH=5d2c6d69c7ab24ef" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Chikankari Kurti 6</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel6">
+        <img src="kurti_images/kurti16.png" alt="Kurti 6-1">
+        <img src="kurti_images/kurti17.png" alt="Kurti 6-2">
+        <img src="kurti_images/kurti18.png" alt="Kurti 6-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel6')">⟨ Prev</button>
+      <button onclick="next('carousel6')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="https://www.flipkart.com/bkc-bazaar-mumbai-mh-women-floral-print-straight-kurta/p/itme42abfa312fc9?pid=KTAHE3ZTF5AZGETZ&lid=LSTKTAHE3ZTF5AZGETZC0JUMS&marketplace=FLIPKART&q=BKC+BAZAAR+&store=search.flipkart.com&srno=s_1_7&otracker=search&otracker1=search&fm=Search&iid=6cc5597d-6689-48ed-bf30-1b5fccf33409.KTAHE3ZTF5AZGETZ.SEARCH&ppt=sp&ppn=sp&qH=5d2c6d69c7ab24ef" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <!-- Row 3 -->
+  <div class="product">
+    <div class="product-title">Silk Kurti 7</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel7">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti7-1" alt="Kurti 7-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti7-2" alt="Kurti 7-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti7-3" alt="Kurti 7-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel7')">⟨ Prev</button>
+      <button onclick="next('carousel7')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Cotton Printed Kurti 8</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel8">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti8-1" alt="Kurti 8-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti8-2" alt="Kurti 8-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti8-3" alt="Kurti 8-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel8')">⟨ Prev</button>
+      <button onclick="next('carousel8')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Designer Kurti 9</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel9">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti9-1" alt="Kurti 9-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti9-2" alt="Kurti 9-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti9-3" alt="Kurti 9-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel9')">⟨ Prev</button>
+      <button onclick="next('carousel9')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <!-- Row 4 -->
+  <div class="product">
+    <div class="product-title">Embroidered Kurti 10</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel10">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti10-1" alt="Kurti 10-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti10-2" alt="Kurti 10-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti10-3" alt="Kurti 10-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel10')">⟨ Prev</button>
+      <button onclick="next('carousel10')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Casual Kurti 11</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel11">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti11-1" alt="Kurti 11-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti11-2" alt="Kurti 11-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti11-3" alt="Kurti 11-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel11')">⟨ Prev</button>
+      <button onclick="next('carousel11')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Party Wear Kurti 12</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel12">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti12-1" alt="Kurti 12-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti12-2" alt="Kurti 12-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti12-3" alt="Kurti 12-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel12')">⟨ Prev</button>
+      <button onclick="next('carousel12')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <!-- Row 5 -->
+  <div class="product">
+    <div class="product-title">Traditional Kurti 13</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel13">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti13-1" alt="Kurti 13-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti13-2" alt="Kurti 13-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti13-3" alt="Kurti 13-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel13')">⟨ Prev</button>
+      <button onclick="next('carousel13')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Modern Kurti 14</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel14">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti14-1" alt="Kurti 14-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti14-2" alt="Kurti 14-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti14-3" alt="Kurti 14-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel14')">⟨ Prev</button>
+      <button onclick="next('carousel14')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Fancy Kurti 15</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel15">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti15-1" alt="Kurti 15-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti15-2" alt="Kurti 15-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti15-3" alt="Kurti 15-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel15')">⟨ Prev</button>
+      <button onclick="next('carousel15')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <!-- Row 6 -->
+  <div class="product">
+    <div class="product-title">Casual Wear Kurti 16</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel16">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti16-1" alt="Kurti 16-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti16-2" alt="Kurti 16-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti16-3" alt="Kurti 16-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel16')">⟨ Prev</button>
+      <button onclick="next('carousel16')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Office Wear Kurti 17</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel17">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti17-1" alt="Kurti 17-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti17-2" alt="Kurti 17-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti17-3" alt="Kurti 17-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel17')">⟨ Prev</button>
+      <button onclick="next('carousel17')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Wedding Kurti 18</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel18">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti18-1" alt="Kurti 18-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti18-2" alt="Kurti 18-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti18-3" alt="Kurti 18-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel18')">⟨ Prev</button>
+      <button onclick="next('carousel18')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <!-- Row 7 -->
+  <div class="product">
+    <div class="product-title">Festive Kurti 19</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel19">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti19-1" alt="Kurti 19-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti19-2" alt="Kurti 19-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti19-3" alt="Kurti 19-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel19')">⟨ Prev</button>
+      <button onclick="next('carousel19')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Summer Kurti 20</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel20">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti20-1" alt="Kurti 20-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti20-2" alt="Kurti 20-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti20-3" alt="Kurti 20-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel20')">⟨ Prev</button>
+      <button onclick="next('carousel20')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Winter Kurti 21</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel21">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti21-1" alt="Kurti 21-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti21-2" alt="Kurti 21-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti21-3" alt="Kurti 21-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel21')">⟨ Prev</button>
+      <button onclick="next('carousel21')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <!-- Row 8 -->
+  <div class="product">
+    <div class="product-title">Designer Kurti 22</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel22">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti22-1" alt="Kurti 22-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti22-2" alt="Kurti 22-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti22-3" alt="Kurti 22-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel22')">⟨ Prev</button>
+      <button onclick="next('carousel22')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Printed Kurti 23</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel23">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti23-1" alt="Kurti 23-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti23-2" alt="Kurti 23-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti23-3" alt="Kurti 23-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel23')">⟨ Prev</button>
+      <button onclick="next('carousel23')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Plain Kurti 24</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel24">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti24-1" alt="Kurti 24-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti24-2" alt="Kurti 24-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti24-3" alt="Kurti 24-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel24')">⟨ Prev</button>
+      <button onclick="next('carousel24')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <!-- Row 9 -->
+  <div class="product">
+    <div class="product-title">Long Kurti 25</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel25">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti25-1" alt="Kurti 25-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti25-2" alt="Kurti 25-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti25-3" alt="Kurti 25-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel25')">⟨ Prev</button>
+      <button onclick="next('carousel25')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Short Kurti 26</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel26">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti26-1" alt="Kurti 26-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti26-2" alt="Kurti 26-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti26-3" alt="Kurti 26-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel26')">⟨ Prev</button>
+      <button onclick="next('carousel26')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">A-Line Kurti 27</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel27">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti27-1" alt="Kurti 27-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti27-2" alt="Kurti 27-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti27-3" alt="Kurti 27-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel27')">⟨ Prev</button>
+      <button onclick="next('carousel27')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <!-- Row 10 -->
+  <div class="product">
+    <div class="product-title">Straight Kurti 28</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel28">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti28-1" alt="Kurti 28-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti28-2" alt="Kurti 28-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti28-3" alt="Kurti 28-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel28')">⟨ Prev</button>
+      <button onclick="next('carousel28')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Anarkali Kurti 29</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel29">
+        <img src="https://via.placeholder.com/300x400/FF5733/FFFFFF?text=Kurti29-1" alt="Kurti 29-1">
+        <img src="https://via.placeholder.com/300x400/C70039/FFFFFF?text=Kurti29-2" alt="Kurti 29-2">
+        <img src="https://via.placeholder.com/300x400/900C3F/FFFFFF?text=Kurti29-3" alt="Kurti 29-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel29')">⟨ Prev</button>
+      <button onclick="next('carousel29')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+
+  <div class="product">
+    <div class="product-title">Designer Kurti 30</div>
+    <div class="carousel-container">
+      <div class="carousel-images" id="carousel30">
+        <img src="https://via.placeholder.com/300x400/581845/FFFFFF?text=Kurti30-1" alt="Kurti 30-1">
+        <img src="https://via.placeholder.com/300x400/FFC300/FFFFFF?text=Kurti30-2" alt="Kurti 30-2">
+        <img src="https://via.placeholder.com/300x400/DAF7A6/FFFFFF?text=Kurti30-3" alt="Kurti 30-3">
+      </div>
+    </div>
+    <div class="controls">
+      <button onclick="prev('carousel30')">⟨ Prev</button>
+      <button onclick="next('carousel30')">Next ⟩</button>
+    </div>
+    <a class="buy-now" href="#" target="_blank">
+      Buy Now
+    </a>
+  </div>
+</div>
+
+<script>
+  // Store the current index for each carousel
+  const carouselIndices = {};
+  
+  // Initialize all carousels with index 0
+  for (let i = 1; i <= 30; i++) {
+    carouselIndices[`carousel${i}`] = 0;
+  }
+
+  function showSlide(carouselId, i) {
+    const carousel = document.getElementById(carouselId);
+    const width = carousel.clientWidth;
+    carousel.style.transform = `translateX(${-width * i}px)`;
+  }
+
+  function next(carouselId) {
+    carouselIndices[carouselId] = (carouselIndices[carouselId] + 1) % 3;
+    showSlide(carouselId, carouselIndices[carouselId]);
+  }
+
+  function prev(carouselId) {
+    carouselIndices[carouselId] = (carouselIndices[carouselId] - 1 + 3) % 3;
+    showSlide(carouselId, carouselIndices[carouselId]);
+  }
+
+  // Initialize all carousels and add event listeners
+  function initializeCarousels() {
+    // Initialize slides
+    for (let i = 1; i <= 30; i++) {
+      showSlide(`carousel${i}`, 0);
+      
+      // Add swipe support for touch devices
+      const carousel = document.getElementById(`carousel${i}`);
+      let startX, startTime;
+      
+      carousel.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startTime = Date.now();
+      });
+
+      carousel.addEventListener('touchmove', (e) => {
+        e.preventDefault(); // Prevent scrolling while swiping
+      });
+
+      carousel.addEventListener('touchend', (e) => {
+        const endX = e.changedTouches[0].clientX;
+        const distance = startX - endX;
+        const timeElapsed = Date.now() - startTime;
+        const velocity = Math.abs(distance) / timeElapsed;
+        
+        // Only trigger swipe if movement is significant and fast enough
+        if (Math.abs(distance) > 50 && velocity > 0.3) {
+          if (distance > 0) next(`carousel${i}`);
+          else prev(`carousel${i}`);
+        }
+      });
+    }
+  }
+
+  // Wait for DOM to load
+  document.addEventListener('DOMContentLoaded', initializeCarousels);
+</script>
+</body>
+</html>
