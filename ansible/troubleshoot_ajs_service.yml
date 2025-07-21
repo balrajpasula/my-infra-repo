@@ -1,0 +1,209 @@
+---
+- name: Troubleshoot and Manage AJS Gunicorn Service
+  hosts: azure_vms2
+  become: yes # Required for systemctl, lsof, etc., to manage services and processes
+
+  vars:
+    ajs_service_name: ajs.service
+    ajs_app_port: 9009
+    ajs_app_path: /var/www/html/ajs # Root directory of your AJS application
+    ajs_venv_path: /var/www/html/ajs/AJS # Path to your Python virtual environment (based on your ExecStart)
+    ajs_debug_log: /var/www/html/ajs/debug.log # Your application's error log file
+    journalctl_lines: 50 # Number of lines to fetch from journalctl for diagnostics
+    disk_check_paths: # Paths to check for disk space
+      - /
+      - /var/www/html
+    min_free_disk_percent: 10 # Minimum free disk space percentage
+    max_memory_usage_percent: 90 # Maximum memory usage percentage
+
+  tasks:
+    - name: Ensure AJS application directory exists (for log file)
+      ansible.builtin.file:
+        path: "{{ ajs_app_path }}"
+        state: directory
+        owner: dvadmin # User specified in your ajs.service file
+        group: www-data # Common group for web servers
+        mode: '0755'
+      # This ensures the directory where your debug.log resides is present and writable.
+
+    - name: Gather initial facts about the AJS service
+      ansible.builtin.systemd_service_facts:
+        name: "{{ ajs_service_name }}"
+      # Collects information about the systemd service, like its active state and PID.
+
+    - name: Display initial AJS service status
+      ansible.builtin.debug:
+        msg: "Initial AJS service status: {{ ansible_facts.services[ajs_service_name].state | default('unknown') }} (Active: {{ ansible_facts.services[ajs_service_name].active | default('unknown') }})"
+      # Provides a quick overview of the service's current operational state.
+
+    - name: Check disk space usage for critical paths
+      ansible.builtin.shell: |
+        df -h {{ item }} | awk 'NR==2 {print $5 " " $1}'
+      loop: "{{ disk_check_paths }}"
+      register: disk_usage_output
+      changed_when: false
+      failed_when: false
+      # Checks disk space for specified paths and extracts usage percentage.
+
+    - name: Display disk space usage
+      ansible.builtin.debug:
+        msg: "Disk Usage for {{ item.item }}: {{ item.stdout }}"
+      loop: "{{ disk_usage_output.results }}"
+      when: item.stdout is defined and item.stdout != ""
+      # Shows the disk usage for each checked path.
+
+    - name: Check if disk space is critically low
+      ansible.builtin.debug:
+        msg: "WARNING: Disk space on {{ item.item }} is {{ item.stdout.split(' ')[0] }} used. This is above the {{ 100 - min_free_disk_percent }}% threshold!"
+      loop: "{{ disk_usage_output.results }}"
+      when:
+        - item.stdout is defined
+        - item.stdout != ""
+        - (item.stdout.split(' ')[0] | replace('%', '') | int) > (100 - min_free_disk_percent)
+      # Alerts if disk space usage exceeds a defined threshold.
+
+    - name: Check memory usage
+      ansible.builtin.shell: |
+        free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2 }'
+      register: memory_usage_output
+      changed_when: false
+      failed_when: false
+      # Calculates and displays the current memory usage percentage.
+
+    - name: Display memory usage
+      ansible.builtin.debug:
+        msg: "Memory Usage: {{ memory_usage_output.stdout }}"
+      when: memory_usage_output.stdout is defined and memory_usage_output.stdout != ""
+      # Shows the current memory usage.
+
+    - name: Check if memory usage is critically high
+      ansible.builtin.debug:
+        msg: "WARNING: Memory usage is {{ memory_usage_output.stdout }}. This is above the {{ max_memory_usage_percent }}% threshold!"
+      when:
+        - memory_usage_output.stdout is defined
+        - memory_usage_output.stdout != ""
+        - (memory_usage_output.stdout | replace('%', '') | float) > max_memory_usage_percent
+      # Alerts if memory usage exceeds a defined threshold.
+
+    - name: Find processes using port {{ ajs_app_port }}
+      ansible.builtin.shell: |
+        lsof -t -i :{{ ajs_app_port }} || true # `|| true` prevents task from failing if no process is found
+      register: port_pids
+      changed_when: false # This task is for information gathering, not changing state
+      failed_when: false # Do not fail if `lsof` is not found or other command errors occur
+      # Identifies PIDs (Process IDs) that are currently listening on the specified port.
+      # This is crucial for diagnosing "Connection in use" errors.
+
+    - name: Display processes found on port {{ ajs_app_port }}
+      ansible.builtin.debug:
+        msg: "Processes on port {{ ajs_app_port }}: {{ port_pids.stdout_lines | default([]) }}"
+      when: port_pids.stdout_lines | length > 0
+      # Shows which processes, if any, are occupying the port.
+
+    - name: Stop AJS service if it's active but potentially problematic (e.g., self-conflict)
+      ansible.builtin.systemd:
+        name: "{{ ajs_service_name }}"
+        state: stopped
+      when:
+        - ansible_facts.services[ajs_service_name].active is defined and ansible_facts.services[ajs_service_name].active == 'active'
+        - port_pids.stdout_lines | length > 0 # Only stop if there's a process on the port
+        # Check if the PID found on the port matches the AJS service's own main PID
+        - (port_pids.stdout_lines | join('')).find(ansible_facts.services[ajs_service_name].main_pid | string) != -1
+      register: stop_service_result
+      ignore_errors: true # Allow this task to fail gracefully if the service is already stopping/stopped
+      # This step ensures a clean slate by stopping the service if it's running but seems to be causing
+      # its own port conflict (e.g., a zombie process from a previous failed restart).
+
+    - name: Kill any lingering processes on port {{ ajs_app_port }} (if not the AJS service itself)
+      ansible.builtin.shell: |
+        for pid in {{ port_pids.stdout_lines | join(' ') }}; do
+          # Check if this PID belongs to the AJS service's current main_pid (if service was active)
+          # If it's the service's PID, we assume the previous stop task handled it.
+          # Otherwise, kill the lingering process.
+          if [ -n "{{ ansible_facts.services[ajs_service_name].main_pid | default('') }}" ] && [ "$pid" == "{{ ansible_facts.services[ajs_service_name].main_pid }}" ]; then
+            echo "Skipping AJS service's own PID {{ ansible_facts.services[ajs_service_name].main_pid }}"
+          else
+            echo "Killing lingering process $pid on port {{ ajs_app_port }}"
+            kill -9 "$pid" # Force kill
+          fi
+        done
+      when:
+        - port_pids.stdout_lines | length > 0 # Only run if processes were found on the port
+        # Only execute if the previous stop task was skipped or didn't result in a change (meaning service wasn't stopped by it)
+        - stop_service_result is not defined or not stop_service_result.changed
+      register: kill_lingering_pids
+      changed_when: kill_lingering_pids.stdout != "" # Mark as changed if any output (meaning a kill happened)
+      ignore_errors: true # In case a PID is already gone or permission issues
+      # This task is critical for resolving "Connection in use" errors caused by external or zombie processes.
+
+    - name: Display result of killing lingering processes
+      ansible.builtin.debug:
+        msg: "{{ kill_lingering_pids.stdout }}"
+      when: kill_lingering_pids.stdout is defined and kill_lingering_pids.stdout != ""
+      # Shows confirmation if any processes were terminated.
+
+    - name: Restart AJS service
+      ansible.builtin.systemd:
+        name: "{{ ajs_service_name }}"
+        state: restarted # Ensures the service is stopped and then started
+        daemon_reload: yes # Reloads systemd daemon to pick up any changes in the service file
+      register: restart_result
+      # This is the primary remediation step. It will restart the service,
+      # whether it was previously inactive, failed, or if lingering processes were killed.
+
+    - name: Re-gather facts about the AJS service after restart attempt
+      ansible.builtin.systemd_service_facts:
+        name: "{{ ajs_service_name }}"
+      when: restart_result is defined and restart_result.changed
+      # Updates service facts to reflect the state after the restart attempt.
+
+    - name: Final AJS service status check
+      ansible.builtin.debug:
+        msg: "Final AJS service status: {{ ansible_facts.services[ajs_service_name].state | default('unknown') }} (Active: {{ ansible_facts.services[ajs_service_name].active | default('unknown') }})"
+      # Provides the final status of the service after all remediation steps.
+
+    - name: Fetch recent AJS systemd journal logs (last {{ journalctl_lines }} lines)
+      ansible.builtin.shell: |
+        journalctl -u {{ ajs_service_name }} --no-pager -n {{ journalctl_lines }}
+      register: journal_logs
+      changed_when: false # Information gathering
+      ignore_errors: true # In case journalctl fails or service has no logs
+
+    - name: Display AJS systemd journal logs
+      ansible.builtin.debug:
+        msg: "AJS Systemd Journal Logs:\n{{ journal_logs.stdout }}"
+      when: journal_logs.stdout is defined and journal_logs.stdout != ""
+      # Systemd journal logs are crucial for understanding service startup/shutdown issues.
+
+    - name: Fetch recent AJS application debug.log (last {{ journalctl_lines }} lines)
+      ansible.builtin.shell: |
+        tail -n {{ journalctl_lines }} {{ ajs_debug_log }} || true
+      register: app_debug_logs
+      changed_when: false # Information gathering
+      ignore_errors: true # In case log file doesn't exist or is empty
+
+    - name: Display AJS application Debug Logs
+      ansible.builtin.debug:
+        msg: "AJS Application Debug Logs (from {{ ajs_debug_log }}):\n{{ app_debug_logs.stdout }}"
+      when: app_debug_logs.stdout is defined and app_debug_logs.stdout != ""
+      # Application's error log, where Gunicorn errors and potentially application-level errors will appear.
+
+    - name: Final summary of AJS service health
+      ansible.builtin.debug:
+        msg: |
+          --- AJS Service Troubleshooting Complete ---
+          Current Service State: {{ ansible_facts.services[ajs_service_name].state | default('unknown') }} (Active: {{ ansible_facts.services[ajs_service_name].active | default('unknown') }})
+
+          If the service is not 'active (running)', please carefully review the logs displayed above for specific error messages.
+
+          Common issues to investigate further include:
+          - **Incorrect `ExecStart` command:** Verify the `gunicorn` command and paths in your `/etc/systemd/system/ajs.service` file.
+          - **Python Virtual Environment Issues:** Ensure `{{ ajs_venv_path }}` is correct and the virtual environment is properly activated/sourced.
+          - **Permissions Problems:** Check if the `dvadmin` user has read/execute permissions on the application directory (`{{ ajs_app_path }}`) and write permissions on the log file (`{{ ajs_debug_log }}`).
+          - **Persistent Port Conflict:** If the "Connection in use" error persists, manually check `sudo lsof -i :{{ ajs_app_port }}` on the target server to identify the rogue process.
+          - **Application-Level Errors:** Detailed errors from your Python application will be in `{{ ajs_debug_log }}`.
+          - **Firewall Configuration:** Ensure port `{{ ajs_app_port }}` is open in your server's firewall (e.g., `ufw`, `firewalld`) and any cloud provider security groups (Azure Network Security Groups).
+          - **Resource Exhaustion:**
+            - **Disk Space:** Check the "Disk Usage" section above. If any critical paths are near 100% full, this can cause various failures.
+            - **Memory:** Check the "Memory Usage" section above. High memory usage can lead to the application being killed by the OOM (Out of Memory) killer.
+          - **External Service Connectivity:** If your application relies on a database, external API, or other services, ensure the server can reach them (e.g., `ping database_server_ip`, `curl http://external_api_endpoint`).
