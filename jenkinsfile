@@ -1,0 +1,58 @@
+pipeline {
+    agent any // This means the pipeline can run on any available agent (Jenkins node)
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // This step is implicitly handled by Jenkins for SCM-based pipelines,
+                // but you can explicitly use 'checkout scm' for clarity or advanced cases.
+                echo 'Checking out source code...'
+                script {
+                    // For a Declarative Pipeline, 'checkout scm' is often implied when 'scm' is used in the pipeline definition.
+                    // However, explicitly calling it ensures it happens and is visible.
+                    // If you configured the SCM in the Jenkins job config (which you did),
+                    // this will use those settings to clone the repo.
+                    checkout scm
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Starting the build process...'
+                sh 'mkdir -p build_artifacts' // Create a directory for simulated artifacts
+                sh 'echo "Simulated build artifact content" > build_artifacts/app.txt' // Create a simulated artifact
+                echo 'Build complete.'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                sh 'echo "Simulated test results: All tests passed!"' // Simulate passing tests
+                // In a real scenario, this would be:
+                // sh 'mvn test' or 'npm test' or 'python -m pytest' etc.
+                echo 'Tests complete.'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
+        success {
+            echo 'Pipeline succeeded!'
+            // Add notifications here, e.g., mail to:
+            // mail to: 'your-email@example.com',
+            //      subject: "Jenkins Build ${env.JOB_NAME} #${env.BUILD_NUMBER} SUCCESS",
+            //      body: "The build for ${env.JOB_NAME} #${env.BUILD_NUMBER} succeeded."
+        }
+        failure {
+            echo 'Pipeline failed!'
+            // mail to: 'your-email@example.com',
+            //      subject: "Jenkins Build ${env.JOB_NAME} #${env.BUILD_NUMBER} FAILED",
+            //      body: "The build for ${env.JOB_NAME} #${env.BUILD_NUMBER} failed. Check console output."
+        }
+    }
+}
