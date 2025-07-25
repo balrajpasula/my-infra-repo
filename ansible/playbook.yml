@@ -49,7 +49,7 @@
         name: phpmyadmin
         question: 'phpmyadmin/dbconfig-install'
         value: 'true'
-        vtype: 'boolean'
+        vtype: 'bolean'
     - debconf:
         name: phpmyadmin
         question: 'phpmyadmin/mysql/admin-pass'
