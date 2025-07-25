@@ -54,7 +54,7 @@
         name: phpmyadmin
         question: 'phpmyadmin/mysql/admin-pass'
         value: "{{ mysql_root_password }}"
-        vtype: 'pssword'
+        vtype: 'password'
     - debconf:
         name: phpmyadmin
         question: 'phpmyadmin/mysql/app-pass'
