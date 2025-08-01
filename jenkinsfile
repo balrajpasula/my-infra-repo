@@ -1,46 +1,11 @@
 pipeline {
     agent any
 
-    tools {
-        git 'Default'
-    }
-
     stages {
-        stage('Checkout Source Code') {
+        stage('Hello') {
             steps {
-                git branch: 'main', credentialsId: 'github-ssh-key', url: 'git@github.com:balrajpasula/my-infra-repo.git'
+                echo 'Hello, Jenkins Pipeline!'
             }
-        }
-
-        stage('Deploy to Nginx') {
-            steps {
-                script {
-                    // Define the deployment path for Nginx (THIS IS THE CRUCIAL LINE)
-                    def deployPath = '/usr/share/nginx/html' 
-
-                    echo "Cleaning up default Nginx index.html..."
-                    // Remove the default index.html provided by Nginx
-                    // Using 'sudo' because the default file is owned by root and needs elevated permissions to delete
-                    sh "sudo rm -f ${deployPath}/index.html" 
-                    
-                    echo "Deploying index1.html to ${deployPath}"
-                    // Copy index1.html from the Jenkins workspace (where git cloned it) to the Nginx web root
-                    sh "cp index1.html ${deployPath}/" // Ensure this path is correct
-                    echo "Deployment successful."
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            echo "Pipeline finished."
-        }
-        success {
-            echo "Deployment was successful!"
-        }
-        failure {
-            echo "Deployment failed! Check console output for errors."
         }
     }
 }
